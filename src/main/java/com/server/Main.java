@@ -6,6 +6,7 @@ import java.util.concurrent.CountDownLatch;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONObject;
 
 public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
 
@@ -28,6 +29,26 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Mensaje recibido: " + message);
+
+        JSONObject obj = new JSONObject(message);
+
+        String type = obj.getString("type");
+
+        if (type.equals("join")) {
+
+            String name = obj.getString("name");
+
+            System.out.println(
+                    "Jugador conectado: " + name
+            );
+
+            JSONObject response = new JSONObject();
+
+            response.put("type", "join_ok");
+            response.put("message", "Bienvenido " + name);
+
+            conn.send(response.toString());
+        }
     }
 
     @Override

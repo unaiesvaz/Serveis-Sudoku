@@ -1,5 +1,7 @@
 package com.client;
 
+import org.json.JSONObject;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -42,39 +44,65 @@ public class Main extends Application { //.\run.ps1 com.client.Main
 
     public static void connectToServer() {
 
-        String servidor = ctrlConfig.txtServidor.getText();
-        String puerto = ctrlConfig.txtPuerto.getText();
-        String jugador = ctrlConfig.txtJugador.getText();
+    String servidor = ctrlConfig.txtServidor.getText();
+    String puerto = ctrlConfig.txtPuerto.getText();
+    String jugador = ctrlConfig.txtJugador.getText();
 
-        String serverUri = "ws://" + servidor + ":" + puerto;
+    String serverUri = "ws://" + servidor + ":" + puerto;
 
-        ctrlConfig.labelConexion.setText("Conectando...");
+    ctrlConfig.labelConexion.setText("Conectando...");
 
-        wsClient = UtilsWS.getSharedInstance(serverUri);
+    wsClient = UtilsWS.getSharedInstance(serverUri);
 
-        wsClient.onOpen((message) -> {
-            Platform.runLater(() -> {
-                ctrlConfig.labelConexion.setText(
-                        "Conectado como " + jugador
-                );
-            });
+    wsClient.onOpen((message) -> {
+
+        Platform.runLater(() -> {
+            ctrlConfig.labelConexion.setText(
+                    "Conectado como " + jugador
+            );
         });
 
-        wsClient.onError((message) -> {
-            Platform.runLater(() -> {
-                ctrlConfig.labelConexion.setText(
-                        "Error de conexión"
-                );
-            });
-        });
+        JSONObject obj = new JSONObject();
 
-        wsClient.onClose((message) -> {
+        obj.put("type", "join");
+        obj.put("name", jugador);
+
+        wsClient.safeSend(obj.toString());
+    });
+
+    wsClient.onMessage((message) -> {
+
+        JSONObject obj = new JSONObject(message);
+
+        String type = obj.getString("type");
+
+        if (type.equals("join_ok")) {
+
+            String mensaje = obj.getString("message");
+
             Platform.runLater(() -> {
-                ctrlConfig.labelConexion.setText(
-                        "Desconectado"
-                );
+                ctrlConfig.labelConexion.setText(mensaje);
             });
+        }
+    });
+
+    wsClient.onError((message) -> {
+
+        Platform.runLater(() -> {
+            ctrlConfig.labelConexion.setText(
+                    "Error de conexión"
+            );
         });
+    });
+
+    wsClient.onClose((message) -> {
+
+        Platform.runLater(() -> {
+            ctrlConfig.labelConexion.setText(
+                    "Desconectado"
+            );
+        });
+    });
     }
 
     @Override
