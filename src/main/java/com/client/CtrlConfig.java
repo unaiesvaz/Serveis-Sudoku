@@ -29,6 +29,6 @@ public class CtrlConfig implements Initializable {
 
     @FXML
     private void connectToServer() { //Listener del boton 
-        labelConexion.setText("Conectando...");
+        Main.connectToServer();
     }
 }
