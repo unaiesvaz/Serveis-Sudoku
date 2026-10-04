@@ -96,6 +96,7 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
             response.put("type", "guess_result");
             response.put("fila", fila);
             response.put("columna", columna);
+            response.put("numero", numero);
             response.put("correcto", correcto);
 
             if (correcto) {
@@ -109,9 +110,27 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
                 player.addScore(-1);
             }
 
-            conn.send(response.toString());
+            if (correcto) {
+                for (WebSocket jugador : players.keySet()) {
+                    jugador.send(response.toString());
+                }
+
+            } else {
+                conn.send(response.toString());
+            }
 
             sendPlayers();
+
+            if (correcto && partidaTerminada()) {
+
+                JSONObject responseFinished = new JSONObject();
+
+                responseFinished.put("type", "game_finished");
+
+                for (WebSocket jugador : players.keySet()) {
+                    jugador.send(responseFinished.toString());
+                }
+            }
         }
     }
 
@@ -169,5 +188,20 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private boolean partidaTerminada() {
+
+    for (int fila = 0; fila < 9; fila++) {
+
+        for (int columna = 0; columna < 9; columna++) {
+
+            if (!casillasResueltas[fila][columna]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
     }
 }

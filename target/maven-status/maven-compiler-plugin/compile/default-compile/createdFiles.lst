@@ -6,3 +6,4 @@ com\server\Player.class
 com\client\CtrlConfig.class
 com\client\CtrlPlay.class
 com\client\UtilsWS$1.class
+com\client\CtrlScore.class

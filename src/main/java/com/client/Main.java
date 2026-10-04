@@ -11,10 +11,10 @@ import javafx.stage.Stage;
 public class Main extends Application { //.\run.ps1 com.client.Main
 
     public static CtrlConfig ctrlConfig;
+    public static CtrlPlay ctrlPlay;
+    public static CtrlScore ctrlScore;
 
     public static UtilsWS wsClient;
-
-    public static CtrlPlay ctrlPlay;
 
     public static void main(String[] args) {
         launch(args);
@@ -40,8 +40,15 @@ public class Main extends Application { //.\run.ps1 com.client.Main
             "/assets/viewPlay.fxml"
         );
 
+        UtilsViews.addView(
+            getClass(),
+            "ViewScore",
+            "/assets/viewScore.fxml"
+        );
+
         ctrlConfig = (CtrlConfig) UtilsViews.getController("ViewConfig");
         ctrlPlay = (CtrlPlay) UtilsViews.getController("ViewPlay");
+        ctrlScore = (CtrlScore) UtilsViews.getController("ViewScore");
 
         Scene scene = new Scene(UtilsViews.parentContainer);
 
@@ -96,17 +103,27 @@ public class Main extends Application { //.\run.ps1 com.client.Main
 
             JSONArray playersArray = obj.getJSONArray("players");
 
-            Platform.runLater(() -> {ctrlPlay.mostrarJugadores(playersArray);});
+            Platform.runLater(() -> {
+                ctrlPlay.mostrarJugadores(playersArray);
+                ctrlScore.mostrarJugadores(playersArray);
+            });
         } else if (type.equals("guess_result")) {
 
             int fila = obj.getInt("fila");
             int columna = obj.getInt("columna");
+            int numero = obj.getInt("numero");
             boolean correcto = obj.getBoolean("correcto");
 
             Platform.runLater(() -> {
-                ctrlPlay.resultadoIntento(fila,columna,correcto);
+                ctrlPlay.resultadoIntento(fila,columna,numero,correcto);
             });
-        }
+        } else if (type.equals("game_finished")) {
+
+            Platform.runLater(() -> {
+
+                UtilsViews.setView("ViewScore");
+            });
+            }
         });
 
         wsClient.onError((message) -> {

@@ -25,6 +25,20 @@ public class CtrlPlay implements Initializable {
     @FXML
     public VBox listaJugadores;
 
+    private final int[][] tableroInicial = {
+        {5, 3, 0, 0, 7, 0, 0, 0, 0},
+        {6, 0, 0, 1, 9, 5, 0, 0, 0},
+        {0, 9, 8, 0, 0, 0, 0, 6, 0},
+
+        {8, 0, 0, 0, 6, 0, 0, 0, 3},
+        {4, 0, 0, 8, 0, 3, 0, 0, 1},
+        {7, 0, 0, 0, 2, 0, 0, 0, 6},
+
+        {0, 6, 0, 0, 0, 0, 2, 8, 0},
+        {0, 0, 0, 4, 1, 9, 0, 0, 5},
+        {0, 0, 0, 0, 8, 0, 0, 7, 9}
+    };
+
     private Button[][] casillas = new Button[9][9];
 
     @Override
@@ -44,14 +58,27 @@ public class CtrlPlay implements Initializable {
                 casilla.setPrefWidth(40);
                 casilla.setPrefHeight(40);
 
+                aplicarBorde(casilla, fila, columna);
+
                 final int filaActual = fila;
                 final int columnaActual = columna;
 
-                casilla.setOnAction(e -> introducirNumero(
-                        casilla,
-                        filaActual,
-                        columnaActual
-                ));
+                if (tableroInicial[fila][columna] != 0) {
+
+                    casilla.setText(
+                        String.valueOf(tableroInicial[fila][columna])
+                    );
+
+                    casilla.setDisable(true);
+
+                } else {
+
+                    casilla.setOnAction(e -> introducirNumero(
+                            casilla,
+                            filaActual,
+                            columnaActual
+                    ));
+                }
 
                 casillas[fila][columna] = casilla;
 
@@ -92,8 +119,8 @@ public class CtrlPlay implements Initializable {
                 int numero = Integer.parseInt(valor);
 
                 if (numero >= 1 && numero <= 9) {
+                    casilla.setText(String.valueOf(numero));
                     Main.enviarIntento(fila, columna, numero);
-
                 }
 
             } catch (NumberFormatException ex) {
@@ -103,15 +130,55 @@ public class CtrlPlay implements Initializable {
         });
     }
 
-    public void resultadoIntento(int fila, int columna, boolean correcto) {
+    public void resultadoIntento(int fila, int columna, int numero, boolean correcto) {
 
     Button casilla = casillas[fila][columna];
 
     if (correcto) {
-
-        casilla.setText("✓");
+        casilla.setText(String.valueOf(numero));
+        casilla.setStyle("-fx-background-color: green;");
         casilla.setDisable(true);
-
     }
+    }
+
+    private void aplicarBorde(Button casilla, int fila, int columna) {
+
+        int arriba = 1;
+        int derecha = 1;
+        int abajo = 1;
+        int izquierda = 1;
+
+        if (fila == 2 || fila == 5) {
+            abajo = 3;
+        }
+
+        if (columna == 2 || columna == 5) {
+            derecha = 3;
+        }
+
+        if (fila == 0) {
+            arriba = 2;
+        }
+
+        if (columna == 0) {
+            izquierda = 2;
+        }
+
+        if (fila == 8) {
+            abajo = 2;
+        }
+
+        if (columna == 8) {
+            derecha = 2;
+        }
+
+        casilla.setStyle(
+            "-fx-border-color: black;" +
+            "-fx-border-width: " +
+            arriba + " " +
+            derecha + " " +
+            abajo + " " +
+            izquierda + ";"
+        );
     }
 }
