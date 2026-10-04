@@ -123,7 +123,14 @@ public class Main extends Application { //.\run.ps1 com.client.Main
 
                 UtilsViews.setView("ViewScore");
             });
-            }
+        } else if (type.equals("board_state")) {
+
+            JSONArray casillasArray = obj.getJSONArray("casillas");
+
+            Platform.runLater(() -> {
+                ctrlPlay.sincronizarTablero(casillasArray);
+            });
+        }
         });
 
         wsClient.onError((message) -> {

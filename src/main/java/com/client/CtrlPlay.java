@@ -132,16 +132,35 @@ public class CtrlPlay implements Initializable {
 
     public void resultadoIntento(int fila, int columna, int numero, boolean correcto) {
 
-    Button casilla = casillas[fila][columna];
+        Button casilla = casillas[fila][columna];
 
-    if (correcto) {
-        casilla.setText(String.valueOf(numero));
-        casilla.setStyle("-fx-background-color: green;");
-        casilla.setDisable(true);
-    }
+            if (correcto) {
+
+                casilla.setText(String.valueOf(numero));
+
+                casilla.setStyle(
+                        "-fx-background-color: green;" +
+                        "-fx-border-color: black;" +
+                        "-fx-border-width: "
+                        + obtenerBorde(fila, columna)
+                        + ";"
+                );
+
+                casilla.setDisable(true);
+            }
     }
 
     private void aplicarBorde(Button casilla, int fila, int columna) {
+
+        casilla.setStyle(
+                "-fx-border-color: black;" +
+                "-fx-border-width: "
+                + obtenerBorde(fila, columna)
+                + ";"
+        );
+    }
+
+    private String obtenerBorde(int fila, int columna) {
 
         int arriba = 1;
         int derecha = 1;
@@ -172,13 +191,40 @@ public class CtrlPlay implements Initializable {
             derecha = 2;
         }
 
-        casilla.setStyle(
-            "-fx-border-color: black;" +
-            "-fx-border-width: " +
-            arriba + " " +
-            derecha + " " +
-            abajo + " " +
-            izquierda + ";"
-        );
+        return arriba + " "
+                + derecha + " "
+                + abajo + " "
+                + izquierda;
+    }
+
+    public void sincronizarTablero(JSONArray casillasArray) {
+
+        for (int i = 0; i < casillasArray.length(); i++) {
+
+            JSONObject obj = casillasArray.getJSONObject(i);
+
+            int fila = obj.getInt("fila");
+            int columna = obj.getInt("columna");
+            int numero = obj.getInt("numero");
+
+            Button casilla = casillas[fila][columna];
+
+            // Si ya estaba bloqueada, es una pista inicial
+            if (casilla.isDisabled()) {
+                continue;
+            }
+
+            casilla.setText(String.valueOf(numero));
+
+            casilla.setStyle(
+                    "-fx-background-color: green;" +
+                    "-fx-border-color: black;" +
+                    "-fx-border-width: "
+                    + obtenerBorde(fila, columna)
+                    + ";"
+            );
+
+            casilla.setDisable(true);
+        }
     }
 }

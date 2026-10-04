@@ -28,7 +28,7 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
     {3, 4, 5, 2, 8, 6, 1, 7, 9}
     };
 
-    private final boolean[][] casillasResueltas = new boolean[9][9];
+    private final boolean[][] casillasResueltas = crearCasillasResueltas();
 
     public Main(InetSocketAddress address) {
         super(address);
@@ -78,6 +78,9 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
             conn.send(response.toString());
 
             sendPlayers();
+
+            enviarEstadoTablero(conn);
+            
         } else if (type.equals("guess")) {
             int fila = obj.getInt("fila");
             int columna = obj.getInt("columna");
@@ -132,6 +135,35 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
                 }
             }
         }
+    }
+
+    private void enviarEstadoTablero(WebSocket conn) {
+
+        JSONArray casillas = new JSONArray();
+
+        for (int fila = 0; fila < 9; fila++) {
+
+            for (int columna = 0; columna < 9; columna++) {
+
+                if (casillasResueltas[fila][columna]) {
+
+                    JSONObject casilla = new JSONObject();
+
+                    casilla.put("fila", fila);
+                    casilla.put("columna", columna);
+                    casilla.put("numero", sudoku[fila][columna]);
+
+                    casillas.put(casilla);
+                }
+            }
+        }
+
+        JSONObject response = new JSONObject();
+
+        response.put("type", "board_state");
+        response.put("casillas", casillas);
+
+        conn.send(response.toString());
     }
 
     private void sendPlayers() { //Se encarga de convertir a los jugadores en JSON y enviarlos a todos los clientes 
@@ -203,5 +235,36 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
     }
 
     return true;
+    }
+
+    private boolean[][] crearCasillasResueltas() {
+
+        boolean[][] resueltas = new boolean[9][9];
+
+        int[][] tableroInicial = {
+            {5, 3, 0, 0, 7, 0, 0, 0, 0},
+            {6, 0, 0, 1, 9, 5, 0, 0, 0},
+            {0, 9, 8, 0, 0, 0, 0, 6, 0},
+
+            {8, 0, 0, 0, 6, 0, 0, 0, 3},
+            {4, 0, 0, 8, 0, 3, 0, 0, 1},
+            {7, 0, 0, 0, 2, 0, 0, 0, 6},
+
+            {0, 6, 0, 0, 0, 0, 2, 8, 0},
+            {0, 0, 0, 4, 1, 9, 0, 0, 5},
+            {0, 0, 0, 0, 8, 0, 0, 7, 9}
+        };
+
+        for (int fila = 0; fila < 9; fila++) {
+
+            for (int columna = 0; columna < 9; columna++) {
+
+                if (tableroInicial[fila][columna] != 0) {
+                    resueltas[fila][columna] = true;
+                }
+            }
+        }
+
+        return resueltas;
     }
 }
