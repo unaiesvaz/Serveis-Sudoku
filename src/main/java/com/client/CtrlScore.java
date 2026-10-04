@@ -1,27 +1,19 @@
 package com.client;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.ResourceBundle;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class CtrlScore implements Initializable {
+public class CtrlScore {
 
     @FXML
     public VBox listaJugadores;
-
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-
-    }
 
     public void mostrarJugadores(JSONArray playersArray) {
 

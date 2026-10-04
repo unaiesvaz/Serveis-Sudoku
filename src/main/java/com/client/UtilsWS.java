@@ -8,7 +8,7 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft_6455;
 import org.java_websocket.handshake.ServerHandshake;
 
-public class UtilsWS { 
+public class UtilsWS { //Esta clase es la conexion con el websocket
 
     private static UtilsWS sharedInstance = null;
 
@@ -172,8 +172,4 @@ public class UtilsWS {
         }
     }
 
-    public boolean isOpen() {
-
-        return client != null && client.isOpen();
-    }
 }

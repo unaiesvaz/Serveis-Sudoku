@@ -54,18 +54,6 @@ public class UtilsViews { //Esta clase, es, por asi decirlo, un gestor de ventan
         return null;
     }
 
-    public static String getActiveView() {
-
-        for (Node n : parentContainer.getChildren()) {
-
-            if (n.isVisible()) {
-                return n.getId();
-            }
-        }
-
-        return null;
-    }
-
     // Sirve para poder cambiar de pantalla
     public static void setView(String viewId) {
 

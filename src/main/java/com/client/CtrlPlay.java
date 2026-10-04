@@ -227,13 +227,7 @@ public class CtrlPlay implements Initializable {
 
             casilla.setText(String.valueOf(numero));
 
-            casilla.setStyle(
-                    "-fx-background-color: green;" +
-                    "-fx-border-color: black;" +
-                    "-fx-border-width: "
-                    + obtenerBorde(fila, columna)
-                    + ";"
-            );
+            aplicarEstiloCasilla(casilla, fila, columna, true);
 
             casilla.setDisable(true);
         }
