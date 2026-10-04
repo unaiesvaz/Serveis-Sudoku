@@ -1,5 +1,6 @@
 package com.client;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import javafx.application.Application;
@@ -12,6 +13,8 @@ public class Main extends Application { //.\run.ps1 com.client.Main
     public static CtrlConfig ctrlConfig;
 
     public static UtilsWS wsClient;
+
+    public static CtrlPlay ctrlPlay;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,12 +29,19 @@ public class Main extends Application { //.\run.ps1 com.client.Main
         UtilsViews.parentContainer.setStyle("-fx-font: 14 arial;");
 
         UtilsViews.addView(
-                getClass(),
-                "ViewConfig",
-                "/assets/viewConfig.fxml"
+            getClass(),
+            "ViewConfig",
+            "/assets/viewConfig.fxml"
+        );
+
+        UtilsViews.addView(
+            getClass(),
+            "ViewPlay",
+            "/assets/viewPlay.fxml"
         );
 
         ctrlConfig = (CtrlConfig) UtilsViews.getController("ViewConfig");
+        ctrlPlay = (CtrlPlay) UtilsViews.getController("ViewPlay");
 
         Scene scene = new Scene(UtilsViews.parentContainer);
 
@@ -57,9 +67,7 @@ public class Main extends Application { //.\run.ps1 com.client.Main
     wsClient.onOpen((message) -> {
 
         Platform.runLater(() -> {
-            ctrlConfig.labelConexion.setText(
-                    "Conectado como " + jugador
-            );
+            ctrlConfig.labelConexion.setText("Conectado como " + jugador);
         });
 
         JSONObject obj = new JSONObject();
@@ -83,24 +91,34 @@ public class Main extends Application { //.\run.ps1 com.client.Main
             Platform.runLater(() -> {
                 ctrlConfig.labelConexion.setText(mensaje);
             });
+        } else if (type.equals("players")) {
+            JSONArray playersArray = obj.getJSONArray("players");
+
+            System.out.println("Jugadores conectados:");
+
+            for (int i = 0; i < playersArray.length(); i++) {
+
+                JSONObject playerObj = playersArray.getJSONObject(i);
+
+                String name = playerObj.getString("name");
+                int score = playerObj.getInt("score");
+
+                System.out.println(name + " - " + score + " puntos");
+            }
         }
     });
 
     wsClient.onError((message) -> {
 
         Platform.runLater(() -> {
-            ctrlConfig.labelConexion.setText(
-                    "Error de conexión"
-            );
+            ctrlConfig.labelConexion.setText("Error de conexión");
         });
     });
 
     wsClient.onClose((message) -> {
 
         Platform.runLater(() -> {
-            ctrlConfig.labelConexion.setText(
-                    "Desconectado"
-            );
+            ctrlConfig.labelConexion.setText("Desconectado");
         });
     });
     }

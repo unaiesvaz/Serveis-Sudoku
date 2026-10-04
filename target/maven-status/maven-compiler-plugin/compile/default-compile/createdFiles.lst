@@ -2,5 +2,6 @@ com\server\Main.class
 com\client\Main.class
 com\client\UtilsViews.class
 com\client\UtilsWS.class
+com\server\Player.class
 com\client\CtrlConfig.class
 com\client\UtilsWS$1.class

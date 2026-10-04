@@ -1,16 +1,20 @@
 package com.server;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
 
     public static final int DEFAULT_PORT = 3000;
+    private final Map<WebSocket, Player> players = new ConcurrentHashMap<>();
 
     public Main(InetSocketAddress address) {
         super(address);
@@ -23,11 +27,21 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        System.out.println("Cliente desconectado: " + reason);
+
+        Player player = players.remove(conn); //Eliminamos a los jugadores que se desconecten 
+
+        if (player != null) {
+            System.out.println(
+                    "Jugador desconectado: " + player.getName()
+            );
+        }
+
+    sendPlayers();
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+
         System.out.println("Mensaje recibido: " + message);
 
         JSONObject obj = new JSONObject(message);
@@ -38,9 +52,11 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
 
             String name = obj.getString("name");
 
-            System.out.println(
-                    "Jugador conectado: " + name
-            );
+            Player player = new Player(name);
+
+            players.put(conn, player);
+
+            System.out.println("Jugador conectado: " + name);
 
             JSONObject response = new JSONObject();
 
@@ -48,7 +64,34 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
             response.put("message", "Bienvenido " + name);
 
             conn.send(response.toString());
+
+            sendPlayers();
+            }
         }
+
+    private void sendPlayers() { //Se encarga de convertir a los jugadores en JSON y enviarlos a todos los clientes 
+
+    JSONArray playersArray = new JSONArray();
+
+    for (Player player : players.values()) {
+
+        JSONObject playerObj = new JSONObject();
+
+        playerObj.put("name", player.getName());
+        playerObj.put("score", player.getScore());
+
+        playersArray.put(playerObj);
+    }
+
+    JSONObject response = new JSONObject();
+
+    response.put("type", "players");
+    response.put("players", playersArray);
+
+    for (WebSocket conn : players.keySet()) {
+
+        conn.send(response.toString());
+    }
     }
 
     @Override
