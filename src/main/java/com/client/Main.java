@@ -86,34 +86,33 @@ public class Main extends Application { //.\run.ps1 com.client.Main
 
         if (type.equals("join_ok")) {
 
-            String mensaje = obj.getString("message");
-
             Platform.runLater(() -> {
-                ctrlConfig.labelConexion.setText(mensaje);
+
+                ctrlPlay.txtJugador.setText("Jugador: " + jugador);
+
+                UtilsViews.setView("ViewPlay");
             });
         } else if (type.equals("players")) {
+
             JSONArray playersArray = obj.getJSONArray("players");
 
-            System.out.println("Jugadores conectados:");
+            Platform.runLater(() -> {ctrlPlay.mostrarJugadores(playersArray);});
+        } else if (type.equals("guess_result")) {
 
-            for (int i = 0; i < playersArray.length(); i++) {
+            int fila = obj.getInt("fila");
+            int columna = obj.getInt("columna");
+            boolean correcto = obj.getBoolean("correcto");
 
-                JSONObject playerObj = playersArray.getJSONObject(i);
-
-                String name = playerObj.getString("name");
-                int score = playerObj.getInt("score");
-
-                System.out.println(name + " - " + score + " puntos");
-            }
+            Platform.runLater(() -> {
+                ctrlPlay.resultadoIntento(fila,columna,correcto);
+            });
         }
-    });
-
-    wsClient.onError((message) -> {
-
-        Platform.runLater(() -> {
-            ctrlConfig.labelConexion.setText("Error de conexión");
         });
-    });
+
+        wsClient.onError((message) -> {
+
+            Platform.runLater(() -> {ctrlConfig.labelConexion.setText("Error de conexión");});
+        });
 
     wsClient.onClose((message) -> {
 
@@ -129,5 +128,17 @@ public class Main extends Application { //.\run.ps1 com.client.Main
         if (wsClient != null) {
             wsClient.forceExit();
         }
+    }
+
+    public static void enviarIntento(int fila, int columna, int numero) {
+
+        JSONObject obj = new JSONObject();
+
+        obj.put("type", "guess");
+        obj.put("fila", fila);
+        obj.put("columna", columna);
+        obj.put("numero", numero);
+
+        wsClient.safeSend(obj.toString());
     }
 }

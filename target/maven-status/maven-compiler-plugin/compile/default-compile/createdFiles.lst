@@ -4,4 +4,5 @@ com\client\UtilsViews.class
 com\client\UtilsWS.class
 com\server\Player.class
 com\client\CtrlConfig.class
+com\client\CtrlPlay.class
 com\client\UtilsWS$1.class

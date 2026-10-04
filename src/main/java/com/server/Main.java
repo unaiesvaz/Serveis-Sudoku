@@ -16,6 +16,20 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
     public static final int DEFAULT_PORT = 3000;
     private final Map<WebSocket, Player> players = new ConcurrentHashMap<>();
 
+    private final int[][] sudoku = {
+    {5, 3, 4, 6, 7, 8, 9, 1, 2},
+    {6, 7, 2, 1, 9, 5, 3, 4, 8},
+    {1, 9, 8, 3, 4, 2, 5, 6, 7},
+    {8, 5, 9, 7, 6, 1, 4, 2, 3},
+    {4, 2, 6, 8, 5, 3, 7, 9, 1},
+    {7, 1, 3, 9, 2, 4, 8, 5, 6},
+    {9, 6, 1, 5, 3, 7, 2, 8, 4},
+    {2, 8, 7, 4, 1, 9, 6, 3, 5},
+    {3, 4, 5, 2, 8, 6, 1, 7, 9}
+    };
+
+    private final boolean[][] casillasResueltas = new boolean[9][9];
+
     public Main(InetSocketAddress address) {
         super(address);
     }
@@ -31,9 +45,7 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
         Player player = players.remove(conn); //Eliminamos a los jugadores que se desconecten 
 
         if (player != null) {
-            System.out.println(
-                    "Jugador desconectado: " + player.getName()
-            );
+            System.out.println("Jugador desconectado: " + player.getName());
         }
 
     sendPlayers();
@@ -66,8 +78,42 @@ public class Main extends WebSocketServer { //.\run.ps1 com.server.Main
             conn.send(response.toString());
 
             sendPlayers();
+        } else if (type.equals("guess")) {
+            int fila = obj.getInt("fila");
+            int columna = obj.getInt("columna");
+            int numero = obj.getInt("numero");
+
+            Player player = players.get(conn);
+
+            if (casillasResueltas[fila][columna]) {
+                return;
             }
+
+            boolean correcto = sudoku[fila][columna] == numero;
+
+            JSONObject response = new JSONObject();
+
+            response.put("type", "guess_result");
+            response.put("fila", fila);
+            response.put("columna", columna);
+            response.put("correcto", correcto);
+
+            if (correcto) {
+
+                casillasResueltas[fila][columna] = true;
+
+                player.addScore(2);
+
+            } else {
+
+                player.addScore(-1);
+            }
+
+            conn.send(response.toString());
+
+            sendPlayers();
         }
+    }
 
     private void sendPlayers() { //Se encarga de convertir a los jugadores en JSON y enviarlos a todos los clientes 
 
