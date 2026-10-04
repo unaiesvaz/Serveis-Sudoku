@@ -137,26 +137,35 @@ public class CtrlPlay implements Initializable {
             if (correcto) {
 
                 casilla.setText(String.valueOf(numero));
-
-                casilla.setStyle(
-                        "-fx-background-color: green;" +
-                        "-fx-border-color: black;" +
-                        "-fx-border-width: "
-                        + obtenerBorde(fila, columna)
-                        + ";"
-                );
-
+                aplicarEstiloCasilla(casilla, fila, columna, true);
                 casilla.setDisable(true);
+            } else {
+                casilla.setText("");
             }
     }
 
     private void aplicarBorde(Button casilla, int fila, int columna) {
 
+        aplicarEstiloCasilla(casilla, fila, columna, false);
+    }
+
+    private void aplicarEstiloCasilla(Button casilla,int fila,int columna,boolean verde) {
+
+        String fondo = "";
+
+        if (verde) {
+            fondo = "-fx-background-color: green;";
+        }
+
         casilla.setStyle(
+                fondo +
+                "-fx-font-weight: bold;" +
                 "-fx-border-color: black;" +
                 "-fx-border-width: "
                 + obtenerBorde(fila, columna)
-                + ";"
+                + ";" +
+                "-fx-background-insets: 0;" +
+                "-fx-border-insets: 0;"
         );
     }
 
@@ -167,6 +176,7 @@ public class CtrlPlay implements Initializable {
         int abajo = 1;
         int izquierda = 1;
 
+        // Separación entre regiones 3x3
         if (fila == 2 || fila == 5) {
             abajo = 3;
         }
@@ -175,16 +185,17 @@ public class CtrlPlay implements Initializable {
             derecha = 3;
         }
 
+        // Borde exterior
         if (fila == 0) {
             arriba = 2;
         }
 
-        if (columna == 0) {
-            izquierda = 2;
-        }
-
         if (fila == 8) {
             abajo = 2;
+        }
+
+        if (columna == 0) {
+            izquierda = 2;
         }
 
         if (columna == 8) {

@@ -44,7 +44,7 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
             </GridPane>
-            <VBox fx:id="listaJugadores" prefHeight="338.0" prefWidth="210.0" />
+            <VBox fx:id="listaJugadores" prefHeight="233.0" prefWidth="210.0" />
          </children>
       </HBox>
    </center>
